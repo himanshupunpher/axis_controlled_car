@@ -1,6 +1,6 @@
 /*
  * Car Receiver for Gesture Controller
- * ESP8266 + L298N Motor Driver
+ * ESP8266 + L298N Motor Driver (PWM Enhanced)
  */
 
 #include <ESP8266WiFi.h>
@@ -16,7 +16,7 @@ WiFiUDP udp;
 const int localPort = 8888;
 char incomingPacket[128];
 
-// ✅ Final L298N Motor Pin Mapping
+// ✅ Final Pin Mapping
 const int IN1 = D2;  // Left motor direction 1
 const int IN2 = D3;  // Left motor direction 2
 const int IN3 = D4;  // Right motor direction 1
@@ -25,7 +25,9 @@ const int ENB = D6;  // Right motor PWM
 const int ENA = D1;  // Left motor PWM
 
 // Motor config
-const int DEAD_ZONE = 10;
+const int DEAD_ZONE = 30;
+const int PWM_LIMIT = 900;
+
 bool debugEnabled = true;
 
 void setup() {
@@ -42,7 +44,7 @@ void setup() {
   startUDP();
   startMDNS();
 
-  Serial.println("Car Receiver Ready");
+  Serial.println("🚗 Car Receiver Ready");
 }
 
 void loop() {
@@ -57,7 +59,7 @@ void loop() {
   }
 }
 
-// ----------------------
+// ------------------------
 
 void connectToWiFi() {
   WiFi.begin(ssid, password);
@@ -85,7 +87,7 @@ void startMDNS() {
   }
 }
 
-// ----------------------
+// ------------------------
 
 void handlePacket(String packet) {
   if (debugEnabled) {
@@ -99,21 +101,31 @@ void handlePacket(String packet) {
 
   if (lIndex == -1 || rIndex == -1 || eIndex == -1) return;
 
-  int left = packet.substring(lIndex + 1, rIndex - 1).toInt();
-  int right = packet.substring(rIndex + 1, eIndex - 1).toInt();
+  int rawLeft = packet.substring(lIndex + 1, rIndex - 1).toInt();
+  int rawRight = packet.substring(rIndex + 1, eIndex - 1).toInt();
   int enable = packet.substring(eIndex + 1).toInt();
+
+  // Scale -255 → 255 to -1023 → 1023, then constrain
+  int left = map(rawLeft, -255, 255, -1023, 1023);
+  int right = map(rawRight, -255, 255, -1023, 1023);
+
+  left = constrain(left, -PWM_LIMIT, PWM_LIMIT);
+  right = constrain(right, -PWM_LIMIT, PWM_LIMIT);
+
+  if (debugEnabled) {
+    Serial.printf("Scaled L: %d  R: %d  E: %d\n", left, right, enable);
+  }
 
   if (!enable) {
     stopMotors();
     return;
   }
 
-  controlL298Motor(ENA, IN1, IN2, left);    // Left motor
-  controlL298Motor(ENB, IN3, IN4, right);   // Right motor
+  controlL298Motor(ENA, IN1, IN2, left);   // Left motor
+  controlL298Motor(ENB, IN3, IN4, right);  // Right motor
 }
 
 void controlL298Motor(int pwmPin, int dirPin1, int dirPin2, int value) {
-  Serial.print(value);
   if (abs(value) < DEAD_ZONE) {
     digitalWrite(dirPin1, LOW);
     digitalWrite(dirPin2, LOW);
