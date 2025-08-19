@@ -88,7 +88,7 @@ void loop() {
   
   // Safety timeout - stop motors if no commands received
   if (millis() - lastPacketTime > SAFETY_TIMEOUT && motorsEnabled) {
-    if (debugEnabled) Serial.println("⚠️  Safety timeout - stopping motors");
+    if (debugEnabled) Serial.println("Safety timeout - stopping motors");
     stopMotors();
     motorsEnabled = false;
   }
@@ -109,7 +109,7 @@ void loop() {
 // ===========================================
 
 void setupMotorPins() {
-  Serial.println("🔧 Initializing motor pins...");
+  Serial.println("Initializing motor pins...");
   
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
@@ -121,13 +121,13 @@ void setupMotorPins() {
   // Start with motors stopped
   stopMotors();
   
-  Serial.println("   Motor pins configured");
+  Serial.println("Motor pins configured");
 }
 
 void testMotors() {
   if (!debugEnabled) return;
   
-  Serial.println("🧪 Testing motors (2 seconds)...");
+  Serial.println("Testing motors (2 seconds)...");
   
   // Test both motors forward briefly
   controlL298Motor(ENA, IN1, IN2, 150);   // Left motor forward
@@ -160,24 +160,24 @@ void connectToWiFi() {
   }
   
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println(" ❌ Failed!");
+    Serial.println("Failed!");
     Serial.println("Check if gesture controller is powered on and creating WiFi AP");
     return;
   }
   
-  Serial.println(" ✅ Connected!");
+  Serial.println("Connected!");
   Serial.printf("   IP Address: %s\n", WiFi.localIP().toString().c_str());
   Serial.printf("   Gateway: %s\n", WiFi.gatewayIP().toString().c_str());
 }
 
 void startUDP() {
   udp.begin(localPort);
-  Serial.printf("📡 UDP listening on port %d\n", localPort);
+  Serial.printf("UDP listening on port %d\n", localPort);
 }
 
 void startMDNS() {
   if (MDNS.begin("car-esp")) {
-    Serial.println("🔍 mDNS started as 'car-esp.local'");
+    Serial.println("mDNS started as 'car-esp.local'");
     MDNS.addService("car-control", "udp", localPort);
   }
 }
@@ -198,7 +198,7 @@ void handlePacket(String packet) {
   int eIndex = packet.indexOf('E');
   
   if (lIndex == -1 || rIndex == -1 || eIndex == -1) {
-    if (debugEnabled) Serial.println("   ❌ Invalid packet format");
+    if (debugEnabled) Serial.println("Invalid packet format");
     return;
   }
   
@@ -277,6 +277,6 @@ void stopMotors() {
   analogWrite(ENB, 0);
   
   if (debugEnabled && motorsEnabled) {
-    Serial.println("   🛑 Motors stopped");
+    Serial.println("Motors stopped");
   }
 }
