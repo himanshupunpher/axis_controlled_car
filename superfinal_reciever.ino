@@ -69,7 +69,7 @@ void setup() {
   // Test motors briefly
   testMotors();
   
-  Serial.println("✅ CAR RECEIVER READY!");
+  Serial.println("CAR RECEIVER READY!");
   Serial.println("Waiting for gesture commands...");
   Serial.println("===============================");
 }
