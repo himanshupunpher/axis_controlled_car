@@ -89,13 +89,13 @@ void setup() {
   
   // Step 1: Initialize sensor
   if (!setupSensor()) {
-    Serial.println("❌ Sensor failed - check wiring!");
+    Serial.println("Sensor failed - check wiring!");
     while(1) delay(1000);
   }
   
   // Step 2: Start Access Point
   if (!startAccessPoint()) {
-    Serial.println("❌ Access Point failed!");
+    Serial.println("Access Point failed!");
     while(1) delay(1000);
   }
   
@@ -105,7 +105,7 @@ void setup() {
   // Step 4: Calibrate sensor
   calibrateSensor();
   
-  Serial.println("✅ SYSTEM READY!");
+  Serial.println("SYSTEM READY!");
   Serial.println("=== GESTURE CONTROLS ===");
   Serial.println("   Tilt Forward/Back: Forward/Reverse");
   Serial.println("   Tilt Left/Right: Turn Left/Right");
@@ -184,7 +184,7 @@ void checkCarConnection() {
       Serial.println("✅ Ready to receive gestures!");
     } else if (numConnected == 0 && carConnected) {
       carConnected = false;
-      Serial.println("⚠️  CAR DISCONNECTED!");
+      Serial.println("CAR DISCONNECTED!");
       // Stop motors when car disconnects
       motors.left = 0;
       motors.right = 0;
@@ -197,7 +197,7 @@ void checkCarConnection() {
 // ===========================================
 
 bool setupSensor() {
-  Serial.print("🔧 Setting up MPU6050... ");
+  Serial.print("Setting up MPU6050... ");
   
   Wire.begin();
   sensor.initialize();
@@ -217,7 +217,7 @@ bool setupSensor() {
 }
 
 void calibrateSensor() {
-  Serial.println("🎯 Calibrating sensor...");
+  Serial.println("Calibrating sensor...");
   Serial.println("   Keep device FLAT and STILL for 3 seconds!");
   delay(3000);
   
@@ -250,7 +250,7 @@ void calibrateSensor() {
   offsets.gyroY = gyroSum[1] / samples;
   offsets.gyroZ = gyroSum[2] / samples;
   
-  Serial.println(" Calibration Complete! ✅");
+  Serial.println(" Calibration Complete!");
 }
 
 void readGesture() {
@@ -418,7 +418,7 @@ void printStatus() {
     lastDebugTime = millis();
     
     // Show connection status first
-    Serial.printf("[%s] ", carConnected ? "🟢 CONNECTED" : "🔴 WAITING   ");
+    Serial.printf("[%s] ", carConnected ? "CONNECTED" : "WAITING   ");
     
     // Show gesture data
     Serial.printf("Roll:%5.1f° Pitch:%5.1f° → L:%4d R:%4d", 
